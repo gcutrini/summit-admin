@@ -14,9 +14,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import T from "i18n-react/dist/i18n-react";
-import BadgeSettingsForm from "../../components/forms/badge-settings-form";
-import BadgePreviewPanel from "../../components/forms/badge-preview-panel";
-import { parseInstalledExtensions ,
+import BadgeSettingsForm from "../../components/forms/badge-settings-form-v2";
+import {
+  parseInstalledExtensions,
   setFieldRenderer,
   clearFieldRenderer
 } from "../../actions/badge-extension-actions";
@@ -55,8 +55,14 @@ class BadgeSettingsPage extends React.Component {
       );
   }
 
-  handleSetFieldRenderer = (fieldName, extId, props) => {
-    this.props.setFieldRenderer(fieldName, extId, props).then(() => {
+  handleOpenPreview = () => {
+    const { match } = this.props;
+    const previewUrl = `${window.location.origin}${match.url}/preview`;
+    window.open(previewUrl, "badge-preview", "width=500,height=700");
+  };
+
+  handleSetFieldRenderer = (fieldName, extId, extProps) => {
+    this.props.setFieldRenderer(fieldName, extId, extProps).then(() => {
       this.props.getBadgeSettings();
     });
   };
@@ -68,45 +74,44 @@ class BadgeSettingsPage extends React.Component {
   };
 
   render() {
-    const {
-      currentSummit,
-      badge_settings: badgeSettings,
-      marketingSettings,
-      errors
-    } = this.props;
+    const { currentSummit, badge_settings: badgeSettings, errors } = this.props;
     const { extensionsRegistry } = this.state;
 
     const installedExtensions = parseInstalledExtensions(badgeSettings || {});
 
     return (
       <div className="container">
-        <h3>{T.translate("badge_settings.badge_settings")}</h3>
+        <div className="row" style={{ marginBottom: "15px" }}>
+          <div className="col-md-6">
+            <h3 style={{ margin: 0 }}>
+              {T.translate("badge_settings.badge_settings")}
+            </h3>
+          </div>
+          <div className="col-md-6 text-right">
+            <button
+              className="btn btn-default"
+              onClick={this.handleOpenPreview}
+            >
+              <i className="fa fa-external-link" /> Open Preview
+            </button>
+          </div>
+        </div>
         <hr />
         {currentSummit && (
-          <div className="row">
-            <div className="col-md-8">
-              <BadgeSettingsForm
-                entity={badgeSettings}
-                currentSummit={currentSummit}
-                errors={errors}
-                onSubmit={this.props.saveBadgeSettings}
-                onDeleteImage={this.props.deleteSetting}
-                onDeleteBadgeTypeImage={this.props.removeBadgeFeatureImage}
-                rendererExtensions={extensionsRegistry.filter(
-                  (ext) => ext.type === "text-field-renderer"
-                )}
-                installedExtensions={installedExtensions}
-                onSetFieldRenderer={this.handleSetFieldRenderer}
-                onClearFieldRenderer={this.handleClearFieldRenderer}
-              />
-            </div>
-            <div className="col-md-4">
-              <BadgePreviewPanel
-                marketingSettings={marketingSettings}
-                badgeSettings={badgeSettings}
-              />
-            </div>
-          </div>
+          <BadgeSettingsForm
+            entity={badgeSettings}
+            currentSummit={currentSummit}
+            errors={errors}
+            onSubmit={this.props.saveBadgeSettings}
+            onDeleteImage={this.props.deleteSetting}
+            onDeleteBadgeTypeImage={this.props.removeBadgeFeatureImage}
+            rendererExtensions={extensionsRegistry.filter(
+              (ext) => ext.type === "text-field-renderer"
+            )}
+            installedExtensions={installedExtensions}
+            onSetFieldRenderer={this.handleSetFieldRenderer}
+            onClearFieldRenderer={this.handleClearFieldRenderer}
+          />
         )}
       </div>
     );
@@ -119,13 +124,6 @@ const mapStateToProps = ({
   baseState
 }) => ({
   currentSummit: currentSummitState.currentSummit,
-  marketingSettings: Object.entries(
-    currentBadgeSettingState.badge_settings || {}
-  ).map(([key, setting]) => ({
-    key,
-    value: setting?.value || "",
-    file: setting?.file || setting?.file_preview || null
-  })),
   loading: baseState.loading,
   ...currentBadgeSettingState
 });

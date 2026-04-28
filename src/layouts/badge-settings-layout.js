@@ -9,7 +9,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
+ * */
 
 import React from "react";
 import { Switch, Route, withRouter } from "react-router-dom";
@@ -18,27 +18,28 @@ import { Breadcrumb } from "react-breadcrumbs";
 import Restrict from "../routes/restrict";
 
 import BadgeSettingsPage from "../pages/badges/badge-settings-page";
+import BadgePreviewPage from "../pages/badges/badge-preview-page";
 import NoMatchPage from "../pages/no-match-page";
 
-class BadgeSettingsLayout extends React.Component {
-  render() {
-    const { match } = this.props;
-    return (
-      <div>
-        <Breadcrumb
-          data={{
-            title: T.translate("badge_settings.badge_settings"),
-            pathname: match.url
-          }}
-        />
-
-        <Switch>
-          <Route strict exact path={match.url} component={BadgeSettingsPage} />
-          <Route component={NoMatchPage} />
-        </Switch>
-      </div>
-    );
-  }
-}
+const BadgeSettingsLayout = ({ match }) => (
+  <div>
+    <Breadcrumb
+      data={{
+        title: T.translate("badge_settings.badge_settings"),
+        pathname: match.url
+      }}
+    />
+    <Switch>
+      <Route strict exact path={match.url} component={BadgeSettingsPage} />
+      <Route
+        strict
+        exact
+        path={`${match.url}/preview`}
+        component={BadgePreviewPage}
+      />
+      <Route component={NoMatchPage} />
+    </Switch>
+  </div>
+);
 
 export default Restrict(withRouter(BadgeSettingsLayout), "badge-settings");
