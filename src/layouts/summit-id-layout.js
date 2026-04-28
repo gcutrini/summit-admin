@@ -51,6 +51,7 @@ import SponsorLayout from "./sponsor-layout";
 import SummitSponsorshipLayout from "./summit-sponsorship-layout";
 import BadgeScansLayout from "./badge-scans-layout";
 import BadgeSettingsLayout from "./badge-settings-layout";
+import BadgeExtensionsLayout from "./badge-extensions-layout";
 import NoMatchPage from "../pages/no-match-page";
 import TicketListPage from "../pages/tickets/ticket-list-page";
 import MarketingLayout from "./marketing-layout";
@@ -221,6 +222,10 @@ const SummitIdLayout = ({ currentSummit, loading, match, ...props }) => {
         <Route
           path={`${match.url}/badge-settings`}
           component={BadgeSettingsLayout}
+        />
+        <Route
+          path={`${match.url}/badge-extensions`}
+          component={BadgeExtensionsLayout}
         />
         <Route path={`${match.url}/marketing`} component={MarketingLayout} />
         <Route path={`${match.url}/summitdocs`} component={SummitDocsLayout} />

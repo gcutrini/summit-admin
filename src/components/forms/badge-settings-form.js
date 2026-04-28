@@ -24,6 +24,7 @@ import Swal from "sweetalert2";
 import "awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css";
 import { isEmpty, scrollToError, shallowEqual } from "../../utils/methods";
 import HexColorInput from "../inputs/hex-color-input";
+import ExtensionConfigForm from "./extension-config-form";
 
 class BadgeSettingsForm extends React.Component {
   constructor(props) {
@@ -40,6 +41,97 @@ class BadgeSettingsForm extends React.Component {
     this.handleUploadFile = this.handleUploadFile.bind(this);
     this.handleRemoveFile = this.handleRemoveFile.bind(this);
     this.handleRemoveBadgeTypeFile = this.handleRemoveBadgeTypeFile.bind(this);
+  }
+
+  renderFieldRendererSelector(fieldName) {
+    const {
+      rendererExtensions = [],
+      installedExtensions = [],
+      onSetFieldRenderer,
+      onClearFieldRenderer
+    } = this.props;
+
+    if (!rendererExtensions.length) return null;
+
+    const currentRenderer = installedExtensions.find(
+      (i) => i.fieldName === fieldName
+    );
+
+    // Only show renderers that are installed (as overlays) or already set on this field
+    const installedExtensionIds = new Set(
+      installedExtensions.map((i) => i.extensionId)
+    );
+    const applicableRenderers = rendererExtensions.filter(
+      (ext) =>
+        installedExtensionIds.has(ext.id) &&
+        (!ext.applicableFields || ext.applicableFields.includes(fieldName))
+    );
+
+    // Show section only if there's a current renderer or available renderers
+    if (!applicableRenderers.length && !currentRenderer) return null;
+
+    return (
+      <div
+        className="row form-group"
+        style={{
+          marginBottom: "15px",
+          paddingBottom: "10px",
+          borderBottom: "1px solid #eee"
+        }}
+      >
+        <div className="col-md-6">
+          <label>Rendering Strategy</label>
+          <select
+            className="form-control"
+            value={currentRenderer?.extensionId || ""}
+            onChange={(ev) => {
+              const extId = ev.target.value;
+              if (extId) {
+                const ext = applicableRenderers.find((e) => e.id === extId);
+                if (ext) {
+                  const defaults = {};
+                  Object.entries(ext.props || {}).forEach(([k, s]) => {
+                    defaults[k] = s.default;
+                  });
+                  onSetFieldRenderer(fieldName, extId, defaults);
+                }
+              } else {
+                onClearFieldRenderer(fieldName);
+              }
+            }}
+          >
+            <option value="">Default (TextFit)</option>
+            {applicableRenderers.map((ext) => (
+              <option key={ext.id} value={ext.id}>
+                {ext.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {currentRenderer &&
+          (() => {
+            const ext = applicableRenderers.find(
+              (e) => e.id === currentRenderer.extensionId
+            );
+            if (!ext?.props) return null;
+            return (
+              <div className="col-md-6">
+                <ExtensionConfigForm
+                  propsSchema={ext.props}
+                  values={currentRenderer.props || {}}
+                  onChange={(propName, value) => {
+                    const newProps = {
+                      ...(currentRenderer.props || {}),
+                      [propName]: value
+                    };
+                    onSetFieldRenderer(fieldName, ext.id, newProps);
+                  }}
+                />
+              </div>
+            );
+          })()}
+      </div>
+    );
   }
 
   componentDidUpdate(prevProps) {
@@ -460,6 +552,7 @@ class BadgeSettingsForm extends React.Component {
           handleClick={this.toggleSection.bind(this, "first_name")}
         >
           <div>
+            {this.renderFieldRendererSelector("firstName")}
             <div className="row form-group">
               <div className="col-md-6">
                 <label>
@@ -640,6 +733,7 @@ class BadgeSettingsForm extends React.Component {
           handleClick={this.toggleSection.bind(this, "last_name")}
         >
           <div>
+            {this.renderFieldRendererSelector("lastName")}
             <h3>{T.translate("badge_settings.last_name")}</h3>
             <div className="row form-group">
               <div className="col-md-6">
@@ -817,6 +911,7 @@ class BadgeSettingsForm extends React.Component {
           handleClick={this.toggleSection.bind(this, "company")}
         >
           <div>
+            {this.renderFieldRendererSelector("company")}
             <h3>{T.translate("badge_settings.company")}</h3>
             <div className="row form-group">
               <div className="col-md-6">
@@ -992,6 +1087,7 @@ class BadgeSettingsForm extends React.Component {
           handleClick={this.toggleSection.bind(this, "title")}
         >
           <div>
+            {this.renderFieldRendererSelector("jobTitle")}
             <h3>{T.translate("badge_settings.title")}</h3>
             <div className="row form-group">
               <div className="col-md-6">

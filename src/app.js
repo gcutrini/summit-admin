@@ -85,6 +85,7 @@ window.SPONSOR_USERS_API_URL = process.env.SPONSOR_USERS_API_URL;
 window.SPONSOR_PAGES_API_URL = process.env.SPONSOR_PAGES_API_URL;
 window.FILE_UPLOAD_API_BASE_URL = process.env.FILE_UPLOAD_API_BASE_URL;
 window.SIGNAGE_BASE_URL = process.env.SIGNAGE_BASE_URL;
+window.PRINT_APP_URL = process.env.PRINT_APP_URL;
 window.INVENTORY_API_BASE_URL = process.env.INVENTORY_API_BASE_URL;
 window.OAUTH2_CLIENT_ID = process.env.OAUTH2_CLIENT_ID;
 window.SCOPES = process.env.SCOPES;

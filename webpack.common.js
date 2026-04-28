@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { ModuleFederationPlugin } = require("webpack").container;
 const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
@@ -14,6 +15,18 @@ const env = require("dotenv").config({
 module.exports = {
   entry: "./src/index.js",
   plugins: [
+    new ModuleFederationPlugin({
+      name: "summitAdmin",
+      remotes: {
+        badgeRenderer: `badgeRenderer@${
+          process.env.PRINT_APP_URL || "https://badge-print.fnopen.com"
+        }/remoteEntry.js`
+      },
+      shared: {
+        react: { singleton: true, requiredVersion: "^16.13.1" },
+        "react-dom": { singleton: true, requiredVersion: "^16.13.1" }
+      }
+    }),
     new Dotenv({
       expand: true
     }),

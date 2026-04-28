@@ -113,7 +113,7 @@ export const getBadgeSettings =
     const params = {
       page,
       per_page: perPage,
-      key__contains: "BADGE_TEMPLATE"
+      key__contains: "BADGE_"
     };
 
     return getRequest(

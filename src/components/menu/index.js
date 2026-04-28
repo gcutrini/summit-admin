@@ -362,6 +362,10 @@ const getSummitItems = (summitId) => [
         linkUrl: `summits/${summitId}/badge-types`
       },
       {
+        name: "badge_extensions",
+        linkUrl: `summits/${summitId}/badge-extensions`
+      },
+      {
         name: "badge_settings",
         linkUrl: `summits/${summitId}/badge-settings`
       }
