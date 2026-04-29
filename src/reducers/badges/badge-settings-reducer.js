@@ -108,19 +108,21 @@ const badgeSettingsReducer = (state = DEFAULT_STATE, action) => {
     case SETTING_ADDED:
     case SETTING_UPDATED: {
       const { response: entity } = payload;
-      const newBadgeSettings = {};
-      Object.keys(state.badge_settings).forEach((key) => {
-        const setting = state.badge_settings[key];
-        if (key === entity.key)
-          newBadgeSettings[key] =
-            entity.type === "FILE"
-              ? { ...setting, id: entity.id, file: entity.file }
-              : { ...setting, id: entity.id, value: entity.value };
-        else newBadgeSettings[key] = setting;
-      });
+      const newBadgeSettings = { ...state.badge_settings };
+      const existing = newBadgeSettings[entity.key] || {};
+      newBadgeSettings[entity.key] =
+        entity.type === "FILE"
+          ? { ...existing, id: entity.id, file: entity.file, key: entity.key }
+          : {
+              ...existing,
+              id: entity.id,
+              value: entity.value,
+              key: entity.key,
+              type: entity.type
+            };
       return {
         ...state,
-        badge_settings: { ...newBadgeSettings }
+        badge_settings: newBadgeSettings
       };
     }
     default:
